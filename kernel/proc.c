@@ -89,6 +89,20 @@ myproc(void)
   return p;
 }
 
+struct proc*
+getproc(int pid)
+{
+  struct proc *p;
+  
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if (p->pid == pid)
+      return p;
+  }
+
+  return 0;
+}
+
+
 int
 allocpid()
 {
@@ -680,4 +694,47 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+uint64 
+map_shared_pages(struct proc* src_proc, struct proc* dst_proc, uint64 src_va, uint64 size) {
+  if (src_proc == 0) 
+    return -1;
+  
+  if (dst_proc == 0)
+    return -1;
+
+  uint64 src_base = PGROUNDDOWN(src_va);
+  uint64 dst_base = PGROUNDUP(dst_proc->sz);  // aligned start for new mappings
+  uint64 mapped_sz = PGROUNDUP(src_va + size) - src_base;
+
+  for (int i = 0; i*PGSIZE < mapped_sz; i++) {
+    pte_t *pte = walk(src_proc->pagetable, src_base + i*PGSIZE, 0);
+    if (!pte || !(*pte & PTE_V) || !(*pte & PTE_U))
+      return -1;
+
+    uint64 pa = PTE2PA(*pte);
+    int perm = PTE_FLAGS(*pte) | PTE_S;
+
+    if (mappages(dst_proc->pagetable, dst_base + i*PGSIZE, PGSIZE, pa, perm) != 0) {
+      uvmunmap(dst_proc->pagetable, dst_base, i, 0);
+      return -1;
+    }
+  }
+
+  dst_proc->sz = dst_base + mapped_sz; // check this later
+  return dst_base + (src_va - PGROUNDDOWN(src_va));
+}
+
+uint64 
+unmap_shared_pages(struct proc* p, uint64 addr, uint64 size) {
+  pte_t *pte = walk(proc->pagetable, addr, 0);
+  if (!pte || !(*pte & PTE_V) || !(*pte & PTE_U) || !(*pte & PTE_S)) 
+    return -1;
+  
+  uint64 npages = size / PGSIZE + 1;
+  uvmunmap(proc->pagetable, PGROUNDDOWN(addr), npages, 0);
+  proc->sz -= PGROUNDUP(size);
+  return 0;
 }

@@ -95,6 +95,7 @@ void            setkilled(struct proc*);
 struct cpu*     mycpu(void);
 struct cpu*     getmycpu(void);
 struct proc*    myproc();
+struct proc*    getproc(int);
 void            procinit(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
@@ -106,6 +107,9 @@ void            yield(void);
 int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
+
+uint64          map_shared_pages(struct proc*, struct proc*, uint64, uint64); // added
+uint64          unmap_shared_pages(struct proc*, uint64, uint64); // added
 
 // swtch.S
 void            swtch(struct context*, struct context*);
