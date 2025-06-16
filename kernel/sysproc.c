@@ -94,8 +94,8 @@ sys_uptime(void)
 uint64
 sys_map_shared_pages(void)
 {
-  int dst_pid;
-  argint(0, &dst_pid);
+  int src_pid;
+  argint(0, &src_pid);
 
   uint64 va;
   argaddr(1, &va);
@@ -103,7 +103,7 @@ sys_map_shared_pages(void)
   uint64 size;
   argaddr(2, &size);
 
-  return map_shared_pages(myproc(), getproc(dst_pid), va, size);
+  return map_shared_pages(getproc(src_pid), myproc(), va, size);
 }
 
 
