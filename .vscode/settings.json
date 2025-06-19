@@ -7,6 +7,9 @@
         "elf.h": "c",
         "proc.h": "c",
         "stat.h": "c",
-        "user.h": "c"
+        "user.h": "c",
+        "exception": "c",
+        "new": "c",
+        "spinlock.h": "c"
     },
 }
