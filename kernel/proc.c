@@ -717,7 +717,7 @@ map_shared_pages(struct proc* src_proc, struct proc* dst_proc, uint64 src_va, ui
     uint64 pa = PTE2PA(*pte);
     int perm = PTE_FLAGS(*pte) | PTE_S;
 
-    if (mappages(dst_proc->pagetable, dst_base + i*PGSIZE, PGSIZE, pa, perm) != 0) {
+    if (mappages(dst_proc->pagetable, dst_base + i*PGSIZE, PGSIZE, pa, perm) != 0) { 
       uvmunmap(dst_proc->pagetable, dst_base, i, 0);
       return -1;
     }

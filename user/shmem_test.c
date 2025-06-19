@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
             if (unmap_shared_pages(caddr, strlen(s)) == -1)
                 printf("Child: failed to unmap\n");
             printf("Child: after unmapping: %p\n", sbrk(0));
-            printf("Child: malloc address %p\n", malloc(64));
+            printf("Child: malloc address %p\n", malloc(0x14000));
             printf("Child: after malloc: %p\n", sbrk(0));
         }
         exit(0);
